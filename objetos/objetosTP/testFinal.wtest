@@ -1,0 +1,273 @@
+import armas.*
+import guerreros.*
+import zonas.*
+import region.*
+
+describe "Tests de Gandalf:" {
+  const gandalf = new Maiar(vida = 100)
+
+  method gandalfCompleto(){
+    const espada = new Espada(multiplicador = 10, origen = elfico)
+    gandalf.cargarArma(espada)
+    const baculo = new Baculo(poder = 400)
+    gandalf.cargarArma(baculo)
+  }
+
+   test "Poder de Gandalf con toda la vida y todas sus armas" {
+    self.gandalfCompleto()
+    assert.equals(2800,gandalf.calcularPoder())
+  }
+
+  test "Poder de Gandalf sin armas y con 80 de vida" {
+    gandalf.cambiarVida(80)
+    assert.equals(1200,gandalf.calcularPoder())
+  }
+
+  test "Poder de Gandalf con 5 de vida y su báculo" {
+    gandalf.cambiarVida(5)
+    const baculo = new Baculo(poder = 400)
+    gandalf.cargarArma(baculo)
+    assert.equals(2300,gandalf.calcularPoder())
+  }
+
+  test "Poder de Gandalf con 30 de vida, su báculo y su espada pero versión enana" {
+    gandalf.cambiarVida(30)
+    const baculo = new Baculo(poder = 400)
+    gandalf.cargarArma(baculo)
+    const espada = new Espada(multiplicador = 10, origen = enano)
+    gandalf.cargarArma(espada)
+    assert.equals(1650,gandalf.calcularPoder())
+  }
+}
+
+describe "Tests de Zonas y Caminos:" {
+
+  const gandalf = new Maiar(vida = 100)
+  const baculo = new Baculo(poder = 400)
+  const espada = new Espada(multiplicador = 10, origen = elfico)
+  const gondor = new Region()
+
+    method gandalfCompleto(){
+    gandalf.cargarArma(espada)
+    gandalf.cargarArma(baculo)
+  }
+
+  test "Gandalf full vida y con sus armas, puede atravesar Lebennin" {
+    self.gandalfCompleto()
+    assert.that(lebennin.puedeAtravesarSolo(gandalf))
+  }
+
+  test "Gandalf sin armas y con 11 de vida puede atravesar Lebennin" {
+    gandalf.cambiarVida(11)
+    assert.notThat(lebennin.puedeAtravesarSolo(gandalf))
+  }
+
+  test "Gandalf sin armas y con 11 de vida puede atravesar Minas Tirith" {
+    gandalf.cambiarVida(11)
+    assert.notThat(minasTirith.puedeAtravesarSolo(gandalf))
+  }
+
+  test "Gandalf full vida y con sus armas, puede atravesar el camino compuesto por Lebennin y Minas Tirith"{
+    self.gandalfCompleto()
+    gondor.definirCamino(lebennin, minasTirith)
+    assert.that(gondor.puedeAtravesar(gandalf))
+  }
+
+  test "Gandalf full vida y con sus armas, atraviesa el camino compuesto por Lebennin y Minas Tirith" {
+    self.gandalfCompleto()
+    gondor.definirCamino(lebennin, minasTirith)
+    gondor.consecuencias(gandalf)
+    assert.equals(90, gandalf.vida())
+  }
+}
+
+describe "Tom Bombadil" {
+
+  const gondor = new Region()
+  test "Tom puede atravesar atravesar Lebennin" {
+    assert.that(lebennin.puedeAtravesarSolo(tomBombadil))
+  }
+
+  test "Tom atraviesa el camino que pasa por Gondor antes mencionado"{
+    gondor.definirCamino(lebennin, minasTirith)
+    gondor.consecuencias(tomBombadil)
+    assert.equals(100, tomBombadil.vida())
+  }
+}
+
+describe "Tests Arsenal:" {
+    test "Espada con multiplicador de 15 y llevada Enano"{
+    const espada = new Espada(multiplicador = 15, origen = enano)
+    assert.equals(300,espada.calcularPoder())
+    }
+
+    test "Hacha con mango de 50 cm, con una hoja de 5kg."{
+    const hacha = new Hacha(mango = 50, hoja = 5)
+    assert.equals(250, hacha.calcularPoder())
+    }
+
+}
+
+describe "Test Guerreros" {
+
+  test "Poder de Frodo (sin items)"{
+    const frodo = new Hobbit(vida = 50)
+    const daga = new Daga(multiplicador = 8, origen = hobbitiano)
+    frodo.cargarArma(daga)
+    assert.equals(50, frodo.calcularPoder())
+  }
+
+  test "Poder de Gimli"{
+    const gimli = new Enano(vida = 75, factor = 3)
+    const hacha1 = new Hacha(mango = 70, hoja = 5)
+    gimli.cargarArma(hacha1)
+    const hacha2 = new Hacha(mango = 70, hoja = 5)
+    gimli.cargarArma(hacha2)
+    assert.equals(2175, gimli.calcularPoder())
+  }
+
+  test "Poder de Légolas"{
+    const legolas = new Elfo(vida = 80, destrezaPropia = 1)
+    const espada = new Espada(multiplicador = 12, origen = elfico)
+    legolas.cargarArma(espada)
+    assert.equals(980, legolas.calcularPoder())
+    //Cuenta: 80 + (2 + 1) * 300 = 980
+  }
+
+  test "Poder de Aragorn"{
+    const aragorn = new Humano(vida = 85, limitadorDePoder = 20)
+    const espada = new Espada(multiplicador = 18, origen = humano)
+    aragorn.cargarArma(espada)
+    const daga = new Daga(multiplicador = 10, origen = humano)
+    aragorn.cargarArma(daga)
+    assert.equals(102.25, aragorn.calcularPoder())
+    /* Cuenta: vida + sumArmas / limPoder = 85 + (18 * 15 + 10 * 15 / 2) / 20 = 102.25*/
+  }
+
+  test "Poder de Gandalf"{
+    const gandalf = new Maiar(vida = 100)
+    const espada = new Espada(multiplicador = 10, origen = elfico)
+    gandalf.cargarArma(espada)
+    const baculo = new Baculo(poder = 400)
+    gandalf.cargarArma(baculo)
+    assert.equals(2800, gandalf.calcularPoder())
+  }
+
+  test "Gandalf con 9 de vida, y todas sus armas"{
+    const gandalf = new Maiar(vida = 9)
+    const espada = new Espada(multiplicador = 10, origen = elfico)
+    gandalf.cargarArma(espada)
+    const baculo = new Baculo(poder = 400)
+    gandalf.cargarArma(baculo)
+    assert.equals(4000, gandalf.calcularPoder())
+    /*Cuenta = vida * Factor + 2 * sumArmas = 9 * 300 + 2 * (25 * 10 + 400) = 4000*/
+  }
+
+  test "Poder de Légolas que obtiene medio punto de destreza propia"{
+    const legolas = new Elfo(vida = 80, destrezaPropia = 0.5)
+    const espada = new Espada(multiplicador = 12, origen = elfico)
+    legolas.cargarArma(espada)
+    assert.equals(830, legolas.calcularPoder())
+    /*Cuenta:vida+(destrezaBase+destrezaPropia)*sumArmas = 80 + (2+0.5)*(12*25) = 830 */
+  }
+}
+
+describe "Los Caminos de la Tierra Media"{
+
+  const gimli = new Enano(vida = 75, factor = 3)
+  const gandalf = new Maiar(vida = 100)
+  const aragorn = new Humano(vida = 85, limitadorDePoder = 20)
+  const gondor = new Region(camino = [lebennin, minasTirith])
+
+  const grupo1 = new GrupoGuerreros(guerreros = #{gimli, gandalf})
+  const grupo2 = new GrupoGuerreros(guerreros = #{gandalf, aragorn, gimli})
+
+  const req1 = new RequerimientoElemento(cantidad = 10, nombreElem = "lemba")
+
+  const lemba3 = new Item(cantidad = 3, nombre = "lemba")
+  const lemba8 = new Item(cantidad = 8, nombre = "lemba")
+
+
+  method gandalfCompleto(){
+    const espada = new Espada(multiplicador = 10, origen = elfico)
+    gandalf.cargarArma(espada)
+    const baculo = new Baculo(poder = 400)
+    gandalf.cargarArma(baculo)
+  }
+
+  method gimliCompleto(){
+    const hacha1 = new Hacha(mango = 70, hoja = 5)
+    gimli.cargarArma(hacha1)
+    const hacha2 = new Hacha(mango = 70, hoja = 5)
+    gimli.cargarArma(hacha2)
+  }
+
+  method aragornCompleto(){
+    const espada = new Espada(multiplicador = 18, origen = humano)
+    aragorn.cargarArma(espada)
+    const daga = new Daga(multiplicador = 10, origen = humano)
+    aragorn.cargarArma(daga)
+  }
+
+  test "Gimli completo puede atravesar lebennin"{
+    self.gimliCompleto()
+    assert.that(lebennin.puedeAtravesarSolo(gimli)) //True 2175 > 1500
+  }
+
+  test "Aragorn completo no puede atravesar lebennin"{
+    self.aragornCompleto()
+    assert.notThat(lebennin.puedeAtravesarSolo(aragorn))
+  }
+
+  test "Gimpli completo puede atravesar el camino de gondor"{
+    self.gimliCompleto()
+    assert.that(gondor.puedeAtravesar(gimli))
+  }
+
+  test "Gimpli sufre danio del camino de gondor"{
+    self.gimliCompleto()
+    gondor.consecuencias(gimli)
+    assert.equals(65,gimli.vida())
+  }
+
+  test "Grupo 1 sufre las consecuencias del camino de gondor"{
+    self.gandalfCompleto()
+    self.gimliCompleto()
+    assert.that(gondor.puedeAtravesarGrupo(grupo1))//pueden atravesar el camino
+    gondor.consecuenciasGrupo(grupo1) //aplico consecuencias al grupo
+    assert.equals(65,gimli.vida())
+    assert.equals(90, gandalf.vida())
+  }
+
+  test "Grupo 2 no puede atravesar el camino de gondor"{
+    self.gandalfCompleto()
+    self.gimliCompleto()
+    self.aragornCompleto()
+    assert.notThat(gondor.puedeAtravesarGrupo(grupo2))//culpa de aragorn
+  }
+
+  test "Grupo1 puede atravesar gondor y requerimientoElemental 1"{
+    self.gandalfCompleto()
+    self.gimliCompleto()
+    lemba3.agregarAElementos(gandalf)
+    lemba8.agregarAElementos(gimli)
+    assert.that(gondor.puedeAtravesarGrupo(grupo1))
+    assert.that(req1.cumpleRequerimiento(grupo1))
+  }
+
+  test "Grupo1 puede atravesar gondor y requerimientoGuerrero de armas"{
+  self.gandalfCompleto()
+  self.gimliCompleto()
+  assert.that(gondor.puedeAtravesarGrupo(grupo1))
+  requerimientoArmas.minimo(1)
+  assert.that(requerimientoArmas.cumpleRequerimiento(grupo1))
+  }
+
+  test "Grupo1 puede atravesar gondor y requerimientoGuerrero de vida"{
+  self.gandalfCompleto()
+  self.gimliCompleto()
+  assert.that(gondor.puedeAtravesarGrupo(grupo1))
+  requerimientoArmas.minimo(85)
+  assert.that(requerimientoVida.cumpleRequerimiento(grupo1))
+  }
+}
